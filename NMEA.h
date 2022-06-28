@@ -41,7 +41,7 @@ bool NMEA::parseData() {
 	stringstream ss_;
 	int buffer_i = 0;
 
-	if (inputData.size() < 6 || inputData.substr(0, 2) != "$G") return false;
+	// if (inputData.size() < 6 || inputData.substr(0, 2) != "$G") return false;
 
 	while ((pos = inputData.find(',')) != string::npos) {
 		if (pos == 0) {
