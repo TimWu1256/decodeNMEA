@@ -28,8 +28,8 @@ int main() {
 	if (!fin) { cerr << "failed to open file!\n"; exit(EXIT_FAILURE); }
 	else {
 		while (getline(fin, data.inputdata)) {
+			dataNum++;
 			if (data.parseData()) {
-				dataNum++;
 				cout << data.inputdata << "\n";
 			}
 			else {
