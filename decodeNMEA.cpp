@@ -1,5 +1,5 @@
 ﻿/*------------------------------------------------------------------------------
-* decodeNMEA2.cpp: decode all NMEA sentences in file.
+* decodeNMEA.cpp: decode all NMEA sentences in file.
 *
 * version: $Revision:$ $Date:$
 * history: 2021/06/21 1.0 new
