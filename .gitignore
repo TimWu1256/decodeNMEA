@@ -1,0 +1,5 @@
+
+*.json
+decodeNMEA.exe
+tmp/test.cpp
+tmp/test.exe
