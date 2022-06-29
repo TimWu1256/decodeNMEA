@@ -5,13 +5,14 @@
 * history: 2022/06/29 1.0 move from decodeNMEA.cpp
 *						  change the type of "buffer": string -> vector<string>
 *						  remove "Maxsize"
+*		   2022/06/30 1.1 filter some invalid sequences
+*						  correct the range of generating the checksum: 0 ~ (size-2) -> 0 ~ (size-4)
 ------------------------------------------------------------------------------*/
 #pragma once
 
 #include <string>
 #include <vector>
 #include <ctype.h>
-#include "cmnfun.h"
 using namespace std;
 
 /* class definition -----------------------------------------------------------*/
@@ -38,10 +39,9 @@ bool NMEA::parseData() {
 	string token;
 	string inputData = this->inputdata;
 	int count = 0;
-	stringstream ss_;
-	int buffer_i = 0;
 
-	// if (inputData.size() < 6 || inputData.substr(0, 2) != "$G") return false;
+	// filter some invalid sentences, like some binary sentences
+	if (inputData.size() < 6 || inputData[0] != '$') return false;
 
 	while ((pos = inputData.find(',')) != string::npos) {
 		if (pos == 0) {
@@ -51,10 +51,6 @@ bool NMEA::parseData() {
 		else {
 			token = inputData.substr(0, pos);
 			buffer.push_back(token);
-			// ss_ << hex << buffer.back();
-			// ss_ >> buffer_i;
-			// if (!isascii(buffer_i))
-			// 	return false;
 			count++;
 			inputData.erase(0, pos + 1);
 		}
@@ -63,26 +59,8 @@ bool NMEA::parseData() {
 	pos = inputData.find('*');
 	token = inputData.substr(0, pos);
 	buffer.push_back(token);
-	// ss_ << hex << buffer.back();
-	// ss_ >> buffer_i;
-	// if (!isascii(buffer_i))
-	// 	return false;
-	count++;
 	inputData.erase(0, pos + 1);
-
 	buffer.push_back(inputData);
-	// ss_ << hex << buffer.back();
-	// ss_ >> buffer_i;
-	// if (!isascii(buffer_i))
-	// 	return false;
-
-
-	// for (int i = 1;i < buffer.size();i++) {
-	// 	ss_ << hex << buffer[i];
-	// 	ss_ >> buffer_i;
-	// 	if (!isascii(buffer_i))
-	// 		return false;
-	// }
 
 	return true;
 }
@@ -90,7 +68,7 @@ bool NMEA::parseData() {
 void NMEA::generateChecksum() {
 	int sum = 0;
 	string inputData = this->inputdata;
-	for (unsigned i = 0; i < inputData.length() - 2; i++) {
+	for (unsigned i = 0; i < inputData.length() - 4; i++) {
 		if (inputData[i] == '$' || inputData[i] == '*')  continue;
 		sum ^= inputData[i];
 	}
@@ -107,6 +85,8 @@ void NMEA::convertChecksum() {
 }
 
 bool NMEA::verify() {
-	if (this->convertedChecksum == this->generatedChecksum)  return true;
-	else  return false;
+	if (this->convertedChecksum == this->generatedChecksum)
+		return true;
+	else
+		return false;
 }
